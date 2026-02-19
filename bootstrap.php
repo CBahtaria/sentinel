@@ -26,6 +26,7 @@ $router = new Router();
 
 // Define routes
 $router->add('/', 'DashboardController', 'index', 'GET');
+$router->add('/dashboard', 'DashboardController', 'index', 'GET');
 $router->add('/login', 'AuthController', 'login', 'GET');
 $router->add('/login', 'AuthController', 'authenticate', 'POST');
 $router->add('/logout', 'AuthController', 'logout', 'GET');
@@ -47,5 +48,22 @@ $router->add('/reports', 'ReportController', 'index', 'GET');
 $router->add('/system/monitor', 'MonitorController', 'index', 'GET');
 $router->add('/system/audit', 'AuditController', 'index', 'GET');
 
+// Debug route (remove in production)
+if ($config->get('app.debug')) {
+    $router->add('/debug', function() {
+        phpinfo();
+    }, 'GET');
+}
+
 // Dispatch the request
-$router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+try {
+    $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
+} catch (Exception $e) {
+    if ($config->get('app.debug')) {
+        echo "<h1>Router Error</h1>";
+        echo "<pre>" . $e->getMessage() . "</pre>";
+    } else {
+        header("HTTP/1.0 500 Internal Server Error");
+        echo "500 - Internal Server Error";
+    }
+}

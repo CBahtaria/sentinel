@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
+    # Make sure RewriteBase is set correctly
+    RewriteBase /
+    
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -16,9 +19,18 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
+# Disable directory browsing
+Options -Indexes
+
 # Security Headers
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "DENY"
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
+
+# Protect hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
