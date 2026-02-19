@@ -1,0 +1,36 @@
+# System files
+*.log
+*.cache
+*.pid
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Environment
+.env
+.env.local
+config/.env
+
+# Runtime
+/storage/logs/*
+/storage/cache/*
+/public/uploads/*
+
+# Backups
+*.bak
+*.backup
+*.old
+/archive/
+/backups/
+
+# Database
+*.sql
+*.sql.gz
