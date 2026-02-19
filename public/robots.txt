@@ -1,0 +1,463 @@
+# ============================================
+# UEDF SENTINEL v5.0 - Robots Exclusion Protocol
+# UMBUTFO ESWATINI DEFENCE FORCE
+# CLASSIFICATION: CONFIDENTIAL
+# Last Updated: 2026-02-17
+# ============================================
+
+# ============================================
+# SYSTEM OVERVIEW
+# ============================================
+# This is a classified military command and control system.
+# All automated access is strictly prohibited.
+# Unauthorized crawling will be logged and investigated.
+# 
+# System: UEDF SENTINEL v5.0
+# Classification: TOP SECRET
+# Jurisdiction: UMBUTFO ESWATINI DEFENCE FORCE
+# ============================================
+
+# ============================================
+# GLOBAL RULES - BLOCK ALL CRAWLERS
+# ============================================
+User-agent: *
+Disallow: /
+
+# ============================================
+# SPECIFIC BOT BLOCKING
+# ============================================
+
+# Block all major search engines
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Googlebot-Image
+Disallow: /
+
+User-agent: Googlebot-News
+Disallow: /
+
+User-agent: Googlebot-Video
+Disallow: /
+
+User-agent: Googlebot-Mobile
+Disallow: /
+
+User-agent: Mediapartners-Google
+Disallow: /
+
+User-agent: AdsBot-Google
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: BingPreview
+Disallow: /
+
+User-agent: msnbot
+Disallow: /
+
+User-agent: msnbot-media
+Disallow: /
+
+User-agent: Slurp
+Disallow: /  # Yahoo
+
+User-agent: Yahoo! Slurp
+Disallow: /
+
+User-agent: Yandex
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: YandexImages
+Disallow: /
+
+User-agent: YandexVideo
+Disallow: /
+
+User-agent: YandexMedia
+Disallow: /
+
+User-agent: YandexBlogs
+Disallow: /
+
+User-agent: YandexNews
+Disallow: /
+
+User-agent: YandexMetrika
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: Baiduspider-image
+Disallow: /
+
+User-agent: Baiduspider-video
+Disallow: /
+
+User-agent: Baiduspider-news
+Disallow: /
+
+User-agent: Sogou
+Disallow: /
+
+User-agent: Sogou web spider
+Disallow: /
+
+User-agent: Sogou inst spider
+Disallow: /
+
+User-agent: Sogou spider2
+Disallow: /
+
+User-agent: Exabot
+Disallow: /
+
+User-agent: facebookexternalhit
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Twitterbot
+Disallow: /
+
+User-agent: LinkedInBot
+Disallow: /
+
+User-agent: Slackbot
+Disallow: /
+
+User-agent: Discordbot
+Disallow: /
+
+User-agent: TelegramBot
+Disallow: /
+
+User-agent: Applebot
+Disallow: /
+
+User-agent: Pinterest
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: rogerbot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: archive.org_bot
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /  # Alexa/Wayback Machine
+
+# ============================================
+# BLOCK ARCHIVE/RESEARCH CRAWLERS
+# ============================================
+
+User-agent: InternetArchive
+Disallow: /
+
+User-agent: NationalArchives
+Disallow: /
+
+User-agent: ResearchBot
+Disallow: /
+
+User-agent: AcademicBot
+Disallow: /
+
+User-agent: scraper
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+# ============================================
+# BLOCK KNOWN BAD BOTS
+# ============================================
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: Majestic-12
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SEMrushBot
+Disallow: /
+
+User-agent: BUbiNG
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: CriteoBot
+Disallow: /
+
+User-agent: Gigabot
+Disallow: /
+
+User-agent: GrapeshotCrawler
+Disallow: /
+
+User-agent: LivelapBot
+Disallow: /
+
+User-agent: magpie-crawler
+Disallow: /
+
+User-agent: MauiBot
+Disallow: /
+
+User-agent: OpenSiteSearch
+Disallow: /
+
+User-agent: PagePeeker
+Disallow: /
+
+User-agent: PaperLiBot
+Disallow: /
+
+User-agent: ProCogBot
+Disallow: /
+
+User-agent: R6_CommentReader
+Disallow: /
+
+User-agent: RepoLookoutBot
+Disallow: /
+
+User-agent: SiteSucker
+Disallow: /
+
+User-agent: SurveyBot
+Disallow: /
+
+User-agent: TurnitinBot
+Disallow: /
+
+User-agent: UnwindFetchor
+Disallow: /
+
+User-agent: urlresolver
+Disallow: /
+
+User-agent: XoviBot
+Disallow: /
+
+User-agent: YottaaMonitor
+Disallow: /
+
+User-agent: zoominfobot
+Disallow: /
+
+# ============================================
+# BLOCK EMAIL HARVESTERS
+# ============================================
+
+User-agent: EmailCollector
+Disallow: /
+
+User-agent: EmailSiphon
+Disallow: /
+
+User-agent: EmailWolf
+Disallow: /
+
+User-agent: ExtractorPro
+Disallow: /
+
+User-agent: Grabber
+Disallow: /
+
+User-agent: Harvest
+Disallow: /
+
+# ============================================
+# CRAWL DELAY - SLOW DOWN ANYWAY
+# ============================================
+
+User-agent: *
+Crawl-delay: 60
+Request-rate: 1/60
+
+# ============================================
+# SITEMAP (NONE - CLASSIFIED SYSTEM)
+# ============================================
+# No sitemap available - system is classified
+# Sitemap: https://example.com/sitemap.xml
+
+# ============================================
+# HOST SPECIFICATION
+# ============================================
+Host: https://localhost:8080/sentinel/
+
+# ============================================
+# CLEAN PARAMETERS (PREVENT DUPLICATE CRAWLING)
+# ============================================
+Clean-param: module
+Clean-param: id
+Clean-param: action
+Clean-param: page
+Clean-param: view
+
+# ============================================
+# ALLOW PATHS (NONE - FULLY RESTRICTED)
+# ============================================
+# No paths are allowed for crawling
+# All access must be authenticated
+
+# ============================================
+# SECURITY NOTICE
+# ============================================
+# ⚠️ WARNING: This is a classified system
+# All access attempts are logged and monitored
+# Unauthorized access is punishable by law
+# 
+# By accessing this system, you consent to:
+# - Monitoring and logging
+# - Security audits
+# - Legal action for violations
+# 
+# UMBUTFO ESWATINI DEFENCE FORCE
+# COMMAND APPROVAL REQUIRED
+# ============================================
+
+# ============================================
+# ADDITIONAL SECURITY DIRECTIVES
+# ============================================
+
+# Block all access to sensitive directories
+Disallow: /admin/
+Disallow: /backups/
+Disallow: /cache/
+Disallow: /config/
+Disallow: /cron/
+Disallow: /data/
+Disallow: /database/
+Disallow: /error/
+Disallow: /includes/
+Disallow: /logs/
+Disallow: /maintenance/
+Disallow: /modules/
+Disallow: /private/
+Disallow: /secure/
+Disallow: /src/
+Disallow: /temp/
+Disallow: /tmp/
+Disallow: /uploads/
+Disallow: /vendor/
+
+# Block access to specific file types
+Disallow: /*.php$
+Disallow: /*.inc$
+Disallow: /*.sql$
+Disallow: /*.bak$
+Disallow: /*.old$
+Disallow: /*.log$
+Disallow: /*.ini$
+Disallow: /*.conf$
+Disallow: /*.config$
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.yml$
+Disallow: /*.yaml$
+Disallow: /*.lock$
+Disallow: /*.dist$
+Disallow: /*.sh$
+Disallow: /*.bat$
+Disallow: /*.exe$
+Disallow: /*.dll$
+Disallow: /*.so$
+Disallow: /*.key$
+Disallow: /*.pem$
+Disallow: /*.crt$
+Disallow: /*.csr$
+
+# Block access to version control
+Disallow: /.git/
+Disallow: /.svn/
+Disallow: /.hg/
+Disallow: /.bzr/
+Disallow: /CVS/
+Disallow: /.gitignore
+Disallow: /.gitattributes
+Disallow: /.gitmodules
+
+# Block access to IDE files
+Disallow: /.idea/
+Disallow: /.vscode/
+Disallow: /.project
+Disallow: /.buildpath
+Disallow: /.settings/
+Disallow: /*.sublime-*
+Disallow: /*.code-workspace
+
+# Block access to backup files
+Disallow: /*.backup
+Disallow: /*.back
+Disallow: /*.bak
+Disallow: /*.old
+Disallow: /*.orig
+Disallow: /*.copy
+Disallow: /*.tmp
+Disallow: /*.temp
+Disallow: /~$
+
+# Block access to documentation
+Disallow: /docs/
+Disallow: /documentation/
+Disallow: /README*
+Disallow: /CHANGELOG*
+Disallow: /LICENSE*
+Disallow: /COPYING*
+Disallow: /INSTALL*
+Disallow: /UPGRADE*
+Disallow: /TODO*
+Disallow: /FIXME*
+
+# ============================================
+# RATE LIMITING DIRECTIVES
+# ============================================
+
+# Suggest rate limiting for any crawler that ignores directives
+User-agent: *
+Request-rate: 1/60
+Crawl-delay: 60
+
+# ============================================
+# MONITORING NOTICE
+# ============================================
+
+# All crawling attempts are monitored by UEDF Cyber Command
+# Suspicious activity will be reported to authorities
+# 
+# For legitimate access requests, contact:
+# UEDF Command Center
+# Email: command@uedf.sz (internal only)
+# 
+# ============================================
+# END OF ROBOTS.TXT
+# ============================================

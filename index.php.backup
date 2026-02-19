@@ -1,0 +1,285 @@
+<?php
+require_once 'includes/session.php';
+/**
+ * UEDF SENTINEL v5.0 - Main Router
+ * UMBUTFO ESWATINI DEFENCE FORCE
+ * Handles all module routing and authentication
+ */
+
+// Only start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    
+}
+
+// Get requested module (sanitize input)
+$module = isset($_GET['module']) ? preg_replace('/[^a-zA-Z0-9\-_]/', '', $_GET['module']) : '';
+
+// Public modules that don't require authentication
+$public_modules = [
+    'login', 
+    'test', 
+    'health', 
+    'db_test',
+    'phpinfo',
+    'api',
+    'api-gateway'
+];
+
+// If already logged in and trying to access login, redirect to home
+if (isset($_SESSION['user_id']) && $module === 'login') {
+    header('Location: ?module=home');
+    exit;
+}
+
+// If not logged in and trying to access protected module
+if (!isset($_SESSION['user_id']) && !in_array($module, $public_modules) && $module !== '') {
+    // Store the requested module for redirect after login
+    $_SESSION['redirect_after_login'] = $module;
+    header('Location: ?module=login');
+    exit;
+}
+
+// Route to appropriate file
+switch($module) {
+    // =============================================
+    // AUTHENTICATION MODULES
+    // =============================================
+    case 'login':
+        include 'login.php';
+        break;
+        
+    case 'logout':
+        include 'logout.php';
+        break;
+        
+    // =============================================
+    // CORE DASHBOARD MODULES
+    // =============================================
+    case 'home':
+    case 'dashboard':
+        include 'home.php';
+        break;
+        
+    // =============================================
+    // AI & ADVANCED FEATURES
+    // =============================================
+    case 'ai-assistant':
+    case 'ai':
+        include 'ai-assistant.php';
+        break;
+        
+    case 'predictive':
+    case 'predictive-analytics':
+        include 'predictive.php';
+        break;
+        
+    // =============================================
+    // DRONE MANAGEMENT
+    // =============================================
+    case 'drone-control':
+    case 'drone-control-system':
+        include 'drone-control.php';
+        break;
+        
+    case 'drones':
+    case 'drone-fleet':
+        include 'drones.php';
+        break;
+        
+    case 'recordings':
+    case 'drone-recordings':
+        include 'recordings.php';
+        break;
+        
+    // =============================================
+    // THREAT MANAGEMENT
+    // =============================================
+    case 'threats':
+    case 'threat-monitor':
+        // Check if threat-monitor.php exists, otherwise use concurrency.php
+        if (file_exists('threat-monitor.php')) {
+            include 'threat-monitor.php';
+        } else {
+            include 'concurrency.php';
+        }
+        break;
+        
+    case 'concurrency':
+        include 'concurrency.php';
+        break;
+        
+    // =============================================
+    // SECURITY & ADMIN
+    // =============================================
+    case 'security':
+    case 'security-center':
+        include 'security.php';
+        break;
+        
+    case 'admin':
+    case 'admin-panel':
+        include 'admin_panel.php';
+        break;
+        
+    case 'settings':
+    case 'system-settings':
+        include 'settings.php';
+        break;
+        
+    case 'audit':
+    case 'audit-logs':
+        include 'audit_log.php';
+        break;
+        
+    // =============================================
+    // MAP & LOCATION
+    // =============================================
+    case 'map':
+    case 'tactical-map':
+        include 'map_view.php';
+        break;
+        
+    // =============================================
+    // ANALYTICS & REPORTS
+    // =============================================
+    case 'analytics':
+    case 'advanced-analytics':
+        include 'analytics.php';
+        break;
+        
+    case 'reports':
+        include 'reports.php';
+        break;
+        
+    // =============================================
+    // SYSTEM & UTILITIES
+    // =============================================
+    case 'health':
+    case 'health-check':
+        include 'health.php';
+        break;
+        
+    case 'db_test':
+    case 'database-test':
+        include 'test_db.php';
+        break;
+        
+    case 'test':
+    case 'phpinfo':
+        phpinfo();
+        break;
+        
+    // =============================================
+    // API ENDPOINTS
+    // =============================================
+    case 'api':
+        if (file_exists('api.php')) {
+            include 'api.php';
+        } else {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'operational',
+                'message' => 'UEDF SENTINEL API',
+                'version' => 'v5.0',
+                'endpoints' => [
+                    'drones' => '/?module=api&endpoint=drones',
+                    'threats' => '/?module=api&endpoint=threats',
+                    'users' => '/?module=api&endpoint=users'
+                ]
+            ]);
+        }
+        break;
+        
+    // =============================================
+    // DEFAULT ROUTING
+    // =============================================
+    default:
+        // If module is empty, redirect appropriately
+        if (empty($module)) {
+            if (isset($_SESSION['user_id'])) {
+                header('Location: ?module=home');
+            } else {
+                header('Location: ?module=login');
+            }
+            exit;
+        }
+        
+        // Try to find module file in modules directory
+        $module_file = 'modules/' . $module . '.php';
+        if (file_exists($module_file)) {
+            include $module_file;
+            break;
+        }
+        
+        // Module not found - show 404 error
+        http_response_code(404);
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>UEDF SENTINEL - 404</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    background: #0a0f1c;
+                    color: #e0e0e0;
+                    font-family: 'Share Tech Mono', monospace;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    padding: 20px;
+                }
+                .error-box {
+                    background: #151f2c;
+                    border: 2px solid #ff006e;
+                    border-radius: 15px;
+                    padding: 40px;
+                    max-width: 500px;
+                    text-align: center;
+                }
+                h1 {
+                    font-family: 'Orbitron', sans-serif;
+                    color: #ff006e;
+                    font-size: 5rem;
+                    margin-bottom: 20px;
+                }
+                h2 {
+                    color: #00ff9d;
+                    margin-bottom: 20px;
+                }
+                p {
+                    color: #a0aec0;
+                    margin-bottom: 30px;
+                }
+                .btn {
+                    display: inline-block;
+                    padding: 12px 30px;
+                    background: #ff006e;
+                    color: #0a0f1c;
+                    text-decoration: none;
+                    border-radius: 30px;
+                    font-family: 'Orbitron', sans-serif;
+                    transition: 0.3s;
+                }
+                .btn:hover {
+                    background: #00ff9d;
+                    transform: translateY(-2px);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="error-box">
+                <h1>404</h1>
+                <h2>MODULE NOT FOUND</h2>
+                <p>The requested module "<?= htmlspecialchars($module) ?>" could not be found.</p>
+                <a href="?module=home" class="btn">RETURN TO COMMAND CENTER</a>
+            </div>
+        </body>
+        </html>
+        <?php
+        break;
+}
+?>

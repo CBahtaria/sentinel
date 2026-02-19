@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>iOS Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background:#0a0f1c; color:#00ff9d; font-family: monospace; padding:20px;">
+    <h1>✅ Page Loads</h1>
+    <p>If you see this, basic HTML works.</p>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('result').innerHTML = `
+            <p>JavaScript: ✅ Working</p>
+            <p>User Agent: ${navigator.userAgent}</p>
+            <p>ServiceWorker: ${'serviceWorker' in navigator ? '✅' : '❌'}</p>
+            <p>Notification: ${'Notification' in window ? '✅' : '❌'}</p>
+        `;
+    </script>
+</body>
+</html>

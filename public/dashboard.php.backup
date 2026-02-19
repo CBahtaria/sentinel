@@ -1,0 +1,61 @@
+<?php
+session_start();
+
+// Simple check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// Get user info
+$username = $_SESSION['username'] ?? 'Unknown';
+$role = $_SESSION['user_role'] ?? 'Unknown';
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BARTARIAN DEFENCE - Dashboard</title>
+    <style>
+        body { background: #0a0f1c; color: #00ff9d; font-family: monospace; padding: 20px; }
+        h1 { color: #ff006e; }
+        .box { border: 1px solid #ff006e; padding: 20px; margin: 20px 0; }
+        .success { color: #00ff9d; }
+        .menu { margin: 20px 0; }
+        .menu a { color: #ff006e; text-decoration: none; margin-right: 20px; }
+        .menu a:hover { color: #00ff9d; }
+    </style>
+</head>
+<body>
+    <h1>?? BARTARIAN DEFENCE Dashboard</h1>
+    
+    <div class="menu">
+        <a href="dashboard.php">Home</a>
+        <a href="logout.php">Logout</a>
+    </div>
+    
+    <div class="box">
+        <h2>Welcome, <?= htmlspecialchars($username) ?>!</h2>
+        <p>Role: <strong><?= htmlspecialchars($role) ?></strong></p>
+        <p class="success">? You are successfully logged in!</p>
+    </div>
+    
+    <div class="box">
+        <h3>Session Info:</h3>
+        <pre>
+Session ID: <?= session_id() ?>
+User ID: <?= $_SESSION['user_id'] ?>
+Login Time: <?= date('Y-m-d H:i:s', $_SESSION['login_time'] ?? time()) ?>
+        </pre>
+    </div>
+    
+    <div class="box">
+        <h3>Quick Links:</h3>
+        <ul>
+            <li><a href="diagnostic.php">System Diagnostic</a></li>
+            <li><a href="admin.php">Admin Panel</a></li>
+            <li><a href="api.php">API</a></li>
+        </ul>
+    </div>
+</body>
+</html>
+

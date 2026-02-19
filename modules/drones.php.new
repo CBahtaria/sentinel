@@ -1,0 +1,41 @@
+Creating updated drones.php...  
+<?php  
+/**  
+ * UEDF SENTINEL v4.0 - Drone Fleet Management  
+ * Database-driven version  
+ */  
+  
+require_once __DIR__ . '/../src/Database/Connection.php';  
+require_once __DIR__ . '/../src/Auth/Session.php';  
+  
+Session::checkLogin();  
+  
+// Get user role for access control  
+$role = $_SESSION['role'] ?? 'viewer';  
+$username = $_SESSION['username'] ?? 'OPERATOR';  
+$full_name = $_SESSION['full_name'] ?? 'Operator';  
+$access_level = ($role === 'commander') ? 'COMMANDER' : 'OPERATOR';  
+$access_color = ($role === 'commander') ? '#ff006e' : '#00ff9d';  
+  
+// Get drones from database  
+try {  
+    $db = DatabaseConnection::getInstance()- 
+ECHO is on.
+    // Get all drones with node assignments  
+    $stmt = $db->query(" >> modules\drones.php.new && echo         SELECT d.*, n.node_name as assigned_node_name >> modules\drones.php.new && echo         FROM drones d >> modules\drones.php.new && echo         LEFT JOIN nodes n ON d.assigned_node_id = n.id >> modules\drones.php.new && echo         ORDER BY d.id >> modules\drones.php.new && echo     ");  
+    $drones = $stmt->fetchAll();  
+ECHO is on.
+    // Calculate stats  
+    $total_drones = count($drones);  
+    $active_count = $db->query("SELECT COUNT(*) FROM drones WHERE status = 'ACTIVE'")->fetchColumn();  
+    $standby_count = $db->query("SELECT COUNT(*) FROM drones WHERE status IN ('STANDBY', 'WARNING')")->fetchColumn();  
+    $critical_count = $db->query("SELECT COUNT(*) FROM drones WHERE status = 'CRITICAL'")->fetchColumn();  
+ECHO is on.
+} catch (Exception $e) {  
+    die("Database error: " . $e->getMessage());  
+}  
+?>  
+<!DOCTYPE html>  
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>UEDF - Drone Fleet Management</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900^&family=Share+Tech+Mono^&display=swap" rel="stylesheet"><style>  
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Share Tech Mono', monospace; }  
+        body { background: #0a0f1c; color: #e0e0e0; padding: 20px; }  

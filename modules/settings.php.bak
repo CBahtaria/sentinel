@@ -1,0 +1,285 @@
+<?php
+/**
+ * Settings Module - UEDF Sentinel
+ */
+
+// Fix the path - use absolute path or correct relative path
+$base_path = dirname(__DIR__); // Goes up one level from modules to sentinel root
+require_once $base_path . '/includes/session.php';
+
+// Check if accessed directly vs through index.php
+if (!isset($_GET['module']) && basename($_SERVER['PHP_SELF']) == 'settings.php') {
+    // Direct access - we need to set up the environment
+    if (!defined('UEDF_ACCESS')) {
+        define('UEDF_ACCESS', true);
+    }
+}
+
+// Load settings
+$settings = [];
+$settings_file = $base_path . '/config/settings.php';
+if (file_exists($settings_file)) {
+    $settings = include $settings_file;
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $updated_settings = $_POST['settings'] ?? [];
+    // Save settings logic here
+    $message = "Settings saved successfully! (Demo mode)";
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UEDF Sentinel - Settings</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #0a0f1e; 
+            color: #fff; 
+            margin: 0; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+        h1 { 
+            color: #00ff00; 
+            border-bottom: 2px solid #00ff00; 
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0,255,0,0.3);
+        }
+        h2 {
+            color: #00ff00;
+            font-size: 1.2em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        .card { 
+            background: #1a1f2e; 
+            padding: 25px; 
+            border-radius: 10px; 
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid #2a2f3e;
+        }
+        .form-group { 
+            margin: 20px 0; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #00ff00; 
+            font-weight: 500;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            background: #0a0f1e; 
+            border: 1px solid #2a2f3e; 
+            color: white; 
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0,255,0,0.2);
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .btn { 
+            background: #00ff00; 
+            color: #000; 
+            padding: 12px 30px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn:hover { 
+            background: #00cc00; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,255,0,0.3);
+        }
+        .message { 
+            background: #00ff00; 
+            color: #000; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .nav { 
+            margin-bottom: 30px; 
+        }
+        .nav a { 
+            color: #00ff00; 
+            text-decoration: none; 
+            margin-right: 20px;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #fff;
+        }
+        .info-box {
+            background: #0a0f1e;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #00ff00;
+            margin: 15px 0;
+        }
+        .badge {
+            background: #00ff00;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="?module=dashboard">← Back to Dashboard</a>
+            <a href="index.php">🏠 Home</a>
+            <a href="?module=settings" style="color: #fff;">⚙️ Settings</a>
+        </div>
+        
+        <h1>⚙️ System Settings</h1>
+        
+        <?php if (isset($message)): ?>
+            <div class="message">✅ <?php echo $message; ?></div>
+        <?php endif; ?>
+        
+        <div class="info-box">
+            <strong>System Status:</strong> UEDF Sentinel v1.0.0 
+            <span class="badge">OPERATIONAL</span>
+        </div>
+        
+        <div class="card">
+            <form method="POST" action="">
+                <h2>📋 System Information</h2>
+                <div class="form-group">
+                    <label>System Name:</label>
+                    <input type="text" name="settings[system_name]" value="<?php echo $settings['system_name'] ?? 'UEDF Sentinel'; ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label>Version:</label>
+                    <input type="text" name="settings[system_version]" value="<?php echo $settings['system_version'] ?? '1.0.0'; ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label>Timezone:</label>
+                    <select name="settings[timezone]">
+                        <option value="Africa/Mbabane" <?php echo ($settings['timezone'] ?? 'Africa/Mbabane') == 'Africa/Mbabane' ? 'selected' : ''; ?>>Africa/Mbabane</option>
+                        <option value="UTC" <?php echo ($settings['timezone'] ?? '') == 'UTC' ? 'selected' : ''; ?>>UTC</option>
+                        <option value="America/New_York" <?php echo ($settings['timezone'] ?? '') == 'America/New_York' ? 'selected' : ''; ?>>America/New York</option>
+                    </select>
+                </div>
+                
+                <h2>🎨 Display Settings</h2>
+                <div class="form-group">
+                    <label>Theme:</label>
+                    <select name="settings[theme]">
+                        <option value="dark" <?php echo ($settings['theme'] ?? 'dark') == 'dark' ? 'selected' : ''; ?>>Dark (Default)</option>
+                        <option value="light" <?php echo ($settings['theme'] ?? '') == 'light' ? 'selected' : ''; ?>>Light</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Items Per Page:</label>
+                    <input type="number" name="settings[items_per_page]" value="<?php echo $settings['items_per_page'] ?? 25; ?>" min="10" max="100">
+                </div>
+                
+                <h2>🔌 Features</h2>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="settings[features][websocket]" value="1" <?php echo ($settings['features']['websocket'] ?? true) ? 'checked' : ''; ?>>
+                        Enable WebSocket (Real-time updates on port 8081)
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="settings[features][drone_tracking]" value="1" <?php echo ($settings['features']['drone_tracking'] ?? true) ? 'checked' : ''; ?>>
+                        Enable Drone Tracking
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="settings[features][threat_detection]" value="1" <?php echo ($settings['features']['threat_detection'] ?? true) ? 'checked' : ''; ?>>
+                        Enable Threat Detection
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="settings[debug_mode]" value="1" <?php echo ($settings['debug_mode'] ?? true) ? 'checked' : ''; ?>>
+                        Debug Mode (Show errors)
+                    </label>
+                </div>
+                
+                <h2>🔐 Security</h2>
+                <div class="form-group">
+                    <label>Session Timeout (seconds):</label>
+                    <input type="number" name="settings[session_timeout]" value="<?php echo $settings['session_timeout'] ?? 3600; ?>" min="60" max="86400">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" name="settings[security][session_httponly]" value="1" <?php echo ($settings['security']['session_httponly'] ?? true) ? 'checked' : ''; ?>>
+                        HTTP Only Cookies (More secure)
+                    </label>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn">💾 Save Settings</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2>ℹ️ System Information</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;">PHP Version:</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;"><?php echo phpversion(); ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;">Server:</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;"><?php echo $_SERVER['SERVER_SOFTWARE'] ?? 'Apache'; ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;">Document Root:</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;"><?php echo $_SERVER['DOCUMENT_ROOT']; ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;">Module Path:</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #2a2f3e;"><?php echo __DIR__; ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">Session Status:</td>
+                    <td style="padding: 10px;">
+                        <?php echo session_status() === PHP_SESSION_ACTIVE ? '✅ Active' : '❌ Inactive'; ?>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
