@@ -1,7 +1,7 @@
 <?php
 namespace UEDF\Core;
 
-use UEDF\Config;
+use UEDF\Config\Config;
 
 class Router {
     private $routes = [];
