@@ -8,7 +8,7 @@ class Config {
     private $config = [];
     
     private function __construct() {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
         
         $this->config = [

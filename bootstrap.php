@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use UEDF\Config;
+use UEDF\Config\Config;
 use UEDF\Core\Router;
 
 // Initialize config

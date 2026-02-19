@@ -3,7 +3,7 @@ namespace UEDF\Database;
 
 use PDO;
 use PDOException;
-use UEDF\Config;
+use UEDF\Config\Config;
 
 class Connection {
     private static $instance = null;
