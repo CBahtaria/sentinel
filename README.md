@@ -91,3 +91,4 @@ UEDF SENTINEL is a comprehensive command and control system designed for the UMB
 1. **Create Database**
 ```sql
 CREATE DATABASE uedf_sentinel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
