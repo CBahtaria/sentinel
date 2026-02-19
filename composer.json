@@ -4,7 +4,8 @@
     "type":  "project",
     "require":  {
                     "php":  "\u003e=8.0",
-                    "vlucas/phpdotenv":  "^5.6"
+                    "vlucas/phpdotenv":  "^5.6",
+        "cboden/ratchet": "^0.4.4"
                 },
     "autoload":  {
                      "psr-4":  {
