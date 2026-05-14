@@ -1,58 +1,54 @@
 <?php
 /**
  * UEDF SENTINEL - Real-time Drone Tracking API
+ * Returns latest telemetry written by the UAV-stack NATS bridge.
+ * No simulated coordinates — data comes from the bridge pipeline.
  */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
 
-require_once '../config/database.php';
-
-$db = Database::getInstance()->getConnection();
-
-// Get all drones with their last known positions
-$drones = $db->query("
-    SELECT id, name, status, battery_level, 
-           location, last_seen,
-           -- Simulate coordinates based on location name
-           CASE 
-               WHEN location LIKE '%Sector 1%' THEN -26.1 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 2%' THEN -26.2 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 3%' THEN -26.3 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 4%' THEN -26.4 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 5%' THEN -26.5 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 6%' THEN -26.6 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 7%' THEN -26.7 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 8%' THEN -26.8 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 9%' THEN -26.9 + (RAND() * 0.1)
-               ELSE -26.5 + (RAND() * 0.5)
-           END as latitude,
-           CASE 
-               WHEN location LIKE '%Sector 1%' THEN 31.1 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 2%' THEN 31.2 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 3%' THEN 31.3 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 4%' THEN 31.4 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 5%' THEN 31.5 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 6%' THEN 31.6 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 7%' THEN 31.7 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 8%' THEN 31.8 + (RAND() * 0.1)
-               WHEN location LIKE '%Sector 9%' THEN 31.9 + (RAND() * 0.1)
-               ELSE 31.5 + (RAND() * 0.5)
-           END as longitude
-    FROM drones
-")->fetchAll(PDO::FETCH_ASSOC);
-
-// Add real-time telemetry
-foreach ($drones as &$drone) {
-    $drone['altitude'] = rand(200, 500) . 'm';
-    $drone['speed'] = rand(30, 60) . ' km/h';
-    $drone['heading'] = rand(0, 359) . '°';
-    $drone['last_update'] = date('H:i:s');
+$cfg = require __DIR__ . '/../config/database.php';
+try {
+    $dsn = "mysql:host={$cfg['host']};port={$cfg['port']};dbname={$cfg['database']};charset={$cfg['charset']}";
+    $db = new PDO($dsn, $cfg['username'], $cfg['password'], [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+} catch (PDOException $e) {
+    http_response_code(503);
+    echo json_encode(['success' => false, 'error' => 'DB unavailable']);
+    exit();
 }
 
+// Latest telemetry per drone via the sentinel_bridge pipeline.
+// Falls back to Eswatini centre coords when no telemetry row exists.
+$stmt = $db->prepare("
+    SELECT
+        d.id, d.name, d.status, d.battery_level, d.location, d.last_seen,
+        COALESCE(t.latitude,  -26.315) AS latitude,
+        COALESCE(t.longitude,  31.135) AS longitude,
+        COALESCE(t.altitude_m,    0.0) AS altitude_m,
+        COALESCE(t.velocity_ms,   0.0) AS speed_ms,
+        COALESCE(t.heading_deg,   0.0) AS heading_deg,
+        t.recorded_at AS telemetry_at
+    FROM drones d
+    LEFT JOIN (
+        SELECT dt.drone_id, dt.latitude, dt.longitude, dt.altitude_m,
+               dt.velocity_ms, dt.heading_deg, dt.recorded_at
+        FROM drone_telemetry dt
+        INNER JOIN (
+            SELECT drone_id, MAX(recorded_at) AS max_ts
+            FROM drone_telemetry
+            GROUP BY drone_id
+        ) latest ON dt.drone_id = latest.drone_id AND dt.recorded_at = latest.max_ts
+    ) t ON d.id = t.drone_id
+    ORDER BY d.id
+");
+$stmt->execute();
+$drones = $stmt->fetchAll();
+
 echo json_encode([
-    'success' => true,
+    'success'   => true,
     'timestamp' => time(),
-    'data' => $drones
+    'data'      => $drones,
 ]);
-?>

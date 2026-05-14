@@ -18,7 +18,9 @@ class SentinelAuth {
      * Default configuration
      */
     private $defaultConfig = [
-        'jwt_secret' => 'your-256-bit-secret-key-change-this-in-production',
+        // JWT secret loaded from environment — never hardcoded.
+        // Set SENTINEL_JWT_SECRET to a 32-byte+ random hex string.
+        'jwt_secret' => '',
         'session_lifetime' => 86400, // 24 hours in seconds
         'refresh_token_lifetime' => 604800, // 7 days in seconds
         'token_bytes' => 32,
@@ -45,6 +47,12 @@ class SentinelAuth {
      */
     public function __construct(array $config = []) {
         $this->pdo = SentinelDB::getInstance();
+        // Inject JWT secret from environment before merging caller config.
+        $jwtSecret = $_ENV['SENTINEL_JWT_SECRET'] ?? getenv('SENTINEL_JWT_SECRET') ?? '';
+        if (empty($jwtSecret)) {
+            throw new \RuntimeException('SENTINEL_JWT_SECRET environment variable must be set');
+        }
+        $this->defaultConfig['jwt_secret'] = $jwtSecret;
         $this->config = array_merge($this->defaultConfig, $config);
         $this->initLogger();
         $this->initTables();

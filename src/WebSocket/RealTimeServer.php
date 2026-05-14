@@ -18,13 +18,39 @@ class RealTimeServer implements MessageComponentInterface {
     }
     
     public function onOpen(ConnectionInterface $conn) {
+        // Validate JWT from ?token= before accepting the connection.
+        $queryString = $conn->httpRequest->getUri()->getQuery();
+        parse_str($queryString, $params);
+        if (!$this->validateJwt($params['token'] ?? '')) {
+            $conn->send(json_encode(['type' => 'error', 'message' => 'Unauthorized']));
+            $conn->close();
+            return;
+        }
+
         $this->clients->attach($conn);
-        echo "New connection! ({$conn->resourceId})\n";
-        
-        // Send initial drone data
-        $stmt = $this->db->query("SELECT * FROM drones WHERE status = 'active'");
-        $drones = $stmt->fetchAll();
-        $conn->send(json_encode(['type' => 'initial', 'data' => $drones]));
+        echo "New connection ({$conn->resourceId})\n";
+
+        // Send initial drone data — selected columns only, no SELECT *.
+        $stmt = $this->db->prepare(
+            "SELECT id, name, status, battery_level, location FROM drones WHERE status = 'active'"
+        );
+        $stmt->execute();
+        $conn->send(json_encode(['type' => 'initial', 'data' => $stmt->fetchAll(\PDO::FETCH_ASSOC)]));
+    }
+
+    private function validateJwt(string $token): bool {
+        if ($token === '') return false;
+        $secret = $_ENV['SENTINEL_JWT_SECRET'] ?? getenv('SENTINEL_JWT_SECRET') ?? '';
+        if ($secret === '') return false;
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) return false;
+        [$hdr, $payload, $sig] = $parts;
+        $expected = rtrim(strtr(base64_encode(
+            hash_hmac('sha256', "$hdr.$payload", $secret, true)
+        ), '+/', '-_'), '=');
+        if (!hash_equals($expected, $sig)) return false;
+        $data = json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
+        return isset($data['exp']) && $data['exp'] > time();
     }
     
     public function onMessage(ConnectionInterface $from, $msg) {
