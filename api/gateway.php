@@ -15,19 +15,20 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('X-XSS-Protection: 1; mode=block');
 
-// CORS headers
-$allowed_origins = [
-    'http://localhost',
-    'https://yourdomain.com',
-    'http://localhost:3000' // Add your frontend URLs
-];
+// CORS headers — no wildcard fallback; reject unknown origins.
+$allowed_origins = array_filter(array_map('trim', explode(',',
+    $_ENV['SENTINEL_CORS_ORIGINS'] ?? getenv('SENTINEL_CORS_ORIGINS')
+        ?? 'http://localhost,http://localhost:3000,http://localhost:8000'
+)));
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowed_origins)) {
+if (in_array($origin, $allowed_origins, true)) {
     header("Access-Control-Allow-Origin: {$origin}");
-} else {
-    header('Access-Control-Allow-Origin: *'); // Fallback, restrict in production
+} elseif ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(403);
+    exit();
 }
+// Non-preflight requests from unknown origins proceed without ACAO header.
 
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-API-Key');
