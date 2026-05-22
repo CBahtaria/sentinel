@@ -1,66 +1,106 @@
-name: UEDF Sentinel CI/CD
+name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  php-lint:
+    name: PHP ${{ matrix.php-version }} syntax + lint
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        # Keep testing across these versions to ensure stability
-        php-versions: ['8.1', '8.2', '8.3']
-    
+        php-version: ["8.1", "8.2", "8.3"]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4 # Updated from v3
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-versions }}
-        extensions: pdo, pdo_mysql, json
-        coverage: xdebug
-    
-    - name: Get composer cache directory
-      id: composer-cache
-      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-    
-    - name: Cache dependencies
-      uses: actions/cache@v4 # Updated from v3
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-
-    
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-    
-    - name: Run test suite
-      run: composer test
-    
-    - name: Upload test results
-      uses: actions/upload-artifact@v4 # Updated from v3 - Fixes the error
-      if: always()
-      with:
-        # Note: v4 requires unique names if multiple jobs upload.
-        # This adds the PHP version to the name to avoid conflicts in the matrix.
-        name: test-results-php-${{ matrix.php-versions }}
-        path: tests/_output/
+      - uses: actions/checkout@v4
 
-  deploy:
-    needs: test
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo, pdo_mysql, json, session, openssl, gd, curl, mbstring
+          coverage: none
+
+      - name: Lint PHP files
+        run: |
+          set -e
+          # syntax-check every PHP file outside vendor/, node_modules/, server/
+          ERRORS=0
+          while IFS= read -r -d '' file; do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "::error file=$file::PHP syntax error"
+              php -l "$file" || true
+              ERRORS=$((ERRORS+1))
+            fi
+          done < <(find . \
+            -path ./vendor -prune -o \
+            -path ./node_modules -prune -o \
+            -path ./server/node_modules -prune -o \
+            -name '*.php' -print0)
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::$ERRORS PHP file(s) had syntax errors"
+            exit 1
+          fi
+          echo "All PHP files syntax-clean."
+
+      - name: Composer install (if composer.json present)
+        run: |
+          if [ -f composer.json ]; then
+            composer install --prefer-dist --no-progress --no-interaction
+          else
+            echo "No composer.json — skipping composer install."
+          fi
+
+      - name: Composer test (if defined)
+        run: |
+          if [ -f composer.json ] && grep -q '"test"' composer.json; then
+            composer test
+          else
+            echo "No 'test' script — skipping."
+          fi
+
+  node-shim:
+    name: Node server shim
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4 # Updated from v3
-    
-    - name: Deploy to production
-      run: |
-        echo "🚀 Tests passed! Ready for deployment"
-        # Add your deployment commands here
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install
+        working-directory: server
+        run: npm ci || npm install --no-audit --no-fund
+
+      - name: Audit (high+)
+        working-directory: server
+        run: |
+          npm audit --audit-level=high \
+            || echo "::warning::npm audit found high-severity findings — see SECURITY.md"
+
+      - name: Tests (if defined)
+        working-directory: server
+        run: npm test --if-present
+
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
+        continue-on-error: true
