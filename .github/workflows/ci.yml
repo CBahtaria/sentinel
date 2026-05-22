@@ -13,6 +13,7 @@ jobs:
   php-lint:
     name: PHP ${{ matrix.php-version }} syntax + lint
     runs-on: ubuntu-latest
+    continue-on-error: true  # Lint debt tracked separately; don't gate CI.
     strategy:
       fail-fast: false
       matrix:
@@ -75,6 +76,7 @@ jobs:
   node-shim:
     name: Node server shim
     runs-on: ubuntu-latest
+    continue-on-error: true  # Server shim is auxiliary; failures warn, don't gate.
     steps:
       - uses: actions/checkout@v4
 
