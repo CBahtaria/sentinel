@@ -11,11 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # Keep testing across these versions to ensure stability
         php-versions: ['8.1', '8.2', '8.3']
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # Updated from v3
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -29,7 +30,7 @@ jobs:
       run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
     
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4 # Updated from v3
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -42,10 +43,12 @@ jobs:
       run: composer test
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4 # Updated from v3 - Fixes the error
       if: always()
       with:
-        name: test-results
+        # Note: v4 requires unique names if multiple jobs upload.
+        # This adds the PHP version to the name to avoid conflicts in the matrix.
+        name: test-results-php-${{ matrix.php-versions }}
         path: tests/_output/
 
   deploy:
@@ -55,10 +58,9 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # Updated from v3
     
     - name: Deploy to production
       run: |
-        echo "? Tests passed! Ready for deployment"
+        echo "🚀 Tests passed! Ready for deployment"
         # Add your deployment commands here
-        # For example: scp, rsync, or API calls to deployment service
