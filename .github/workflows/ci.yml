@@ -16,9 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # PHP 8.0 minimum per composer.json. Lint runs across every supported
-        # runtime and gates merges; no 8.1+/8.2+-only syntax is in use today.
-        php-version: ["8.0", "8.1", "8.2", "8.3"]
+        # phpunit/phpunit ^11.5 (require-dev) needs PHP >=8.2, so the
+        # effective dev floor is 8.2 even though composer.json's runtime
+        # require still allows 8.0+. Lint and tests both run on 8.2/8.3.
+        php-version: ["8.2", "8.3"]
     steps:
       - uses: actions/checkout@v4
 
@@ -74,6 +75,13 @@ jobs:
             composer install --prefer-dist --no-progress --no-interaction
           else
             echo "No composer.json — skipping composer install."
+          fi
+
+      - name: Seed test .env from .env.example
+        run: |
+          if [ ! -f .env ] && [ -f .env.example ]; then
+            cp .env.example .env
+            echo "Seeded .env from .env.example for CI test run."
           fi
 
       - name: Composer test (if defined)
