@@ -82,17 +82,15 @@ The audit document captures the structural baseline; runtime hardening
 (SIEM integration, anomaly detection, audit log review cadence) is a
 separate workstream.
 
-## Broken Stubs (CI-Excluded)
+## Removed Scaffold Stubs
 
-Five files were committed in the initial scaffolding with corrupted content
-(`ECHO is on.` literal injection from a Windows shell capture, truncated
-`$this->` references, and broken assignments). They use the `Sentinel\`
-namespace, which is **not** declared in `composer.json`'s PSR-4 autoload
-(`UEDF\\` → `src/`), so the autoloader cannot reach them. A repo-wide
-search confirms **zero callers** — no `require`, no `include`, no `use`
-statement outside the broken files themselves.
-
-The PHP lint job in CI skips these files via a `case` carve-out:
+Five files committed at the initial scaffolding (`b79e421`) carried
+corrupted content — literal `ECHO is on.` injection from a Windows shell
+capture, truncated `$this->` references, broken `=` assignments — and
+declared a `Sentinel\` namespace that was never wired into
+`composer.json`'s PSR-4 autoload (`UEDF\\` → `src/`). A repo-wide search
+confirmed zero callers. They were removed entirely in the May 2026
+CI honesty pass:
 
 - `src/Security/CSRF.php`
 - `src/health.php`
@@ -100,8 +98,6 @@ The PHP lint job in CI skips these files via a `case` carve-out:
 - `src/WebSocket/Server.php`
 - `src/Collaboration/TeamManager.php`
 
-Either finish the stubs (matching the existing `UEDF\\` namespace and the
-neighbour files in each directory — `src/Auth/Session.php`,
-`src/WebSocket/RealTimeServer.php`, etc.) or delete them. Until then, the
-carve-out keeps the lint honest about the rest of the codebase without
-hiding new debt.
+If real implementations are needed later, use the existing `UEDF\\`
+namespace and follow the working neighbours (`src/Auth/Session.php`,
+`src/Auth/TokenAuth.php`, `src/WebSocket/RealTimeServer.php`).
