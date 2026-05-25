@@ -13,13 +13,12 @@ jobs:
   php-lint:
     name: PHP ${{ matrix.php-version }} syntax + lint
     runs-on: ubuntu-latest
-    continue-on-error: true  # Lint debt tracked separately; don't gate CI.
     strategy:
       fail-fast: false
       matrix:
-        # 8.2 is the minimum supported runtime (8.1 lacks readonly classes,
-        # enum-in-interface, and other syntax used in src/).
-        php-version: ["8.2", "8.3"]
+        # PHP 8.0 minimum per composer.json. Lint runs across every supported
+        # runtime and gates merges; no 8.1+/8.2+-only syntax is in use today.
+        php-version: ["8.0", "8.1", "8.2", "8.3"]
     steps:
       - uses: actions/checkout@v4
 
@@ -32,14 +31,14 @@ jobs:
       - name: Lint PHP files
         run: |
           # Syntax-check every PHP file outside vendor/, node_modules/, server/,
-          # and known template-generator scripts (scripts/generate_*.php) that
-          # embed heredoc-style PHP-in-PHP and aren't intended to be parsed
-          # standalone. Warn-don't-fail until the lint debt is paid off.
+          # and scripts/generate_*.php (template-generators that embed
+          # heredoc-style PHP-in-PHP and aren't intended to be parsed standalone).
+          # Fails the job on any real parse error.
           ERRORS=0
           BAD_FILES=""
           while IFS= read -r -d '' file; do
             if ! php -l "$file" > /dev/null 2>&1; then
-              echo "::warning file=$file::PHP syntax error"
+              echo "::error file=$file::PHP syntax error"
               php -l "$file" 2>&1 | head -3 || true
               ERRORS=$((ERRORS+1))
               BAD_FILES="$BAD_FILES\n$file"
@@ -51,11 +50,11 @@ jobs:
             -path ./scripts -prune -o \
             -name '*.php' -print0)
           if [ "$ERRORS" -gt 0 ]; then
-            echo "::warning::$ERRORS PHP file(s) had syntax errors. Tracked but not gating."
+            echo "::error::$ERRORS PHP file(s) had syntax errors."
             printf '%b\n' "$BAD_FILES"
-          else
-            echo "All PHP files syntax-clean."
+            exit 1
           fi
+          echo "All PHP files syntax-clean."
 
       - name: Composer install (if composer.json present)
         run: |
