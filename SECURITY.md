@@ -81,3 +81,27 @@ threat model assumes:
 The audit document captures the structural baseline; runtime hardening
 (SIEM integration, anomaly detection, audit log review cadence) is a
 separate workstream.
+
+## Broken Stubs (CI-Excluded)
+
+Five files were committed in the initial scaffolding with corrupted content
+(`ECHO is on.` literal injection from a Windows shell capture, truncated
+`$this->` references, and broken assignments). They use the `Sentinel\`
+namespace, which is **not** declared in `composer.json`'s PSR-4 autoload
+(`UEDF\\` → `src/`), so the autoloader cannot reach them. A repo-wide
+search confirms **zero callers** — no `require`, no `include`, no `use`
+statement outside the broken files themselves.
+
+The PHP lint job in CI skips these files via a `case` carve-out:
+
+- `src/Security/CSRF.php`
+- `src/health.php`
+- `src/Auth/Authentication.php`
+- `src/WebSocket/Server.php`
+- `src/Collaboration/TeamManager.php`
+
+Either finish the stubs (matching the existing `UEDF\\` namespace and the
+neighbour files in each directory — `src/Auth/Session.php`,
+`src/WebSocket/RealTimeServer.php`, etc.) or delete them. Until then, the
+carve-out keeps the lint honest about the rest of the codebase without
+hiding new debt.
