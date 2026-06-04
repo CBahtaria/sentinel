@@ -7,7 +7,7 @@ use PDO;
 
 /**
  * UEDF SENTINEL v5.0 - Drone Fleet Management
- * UMBUTFO ESWATINI DEFENCE FORCE
+ * Unified Eswatini Defence Force
  * Complete drone inventory and status monitoring
  */
 class DroneController {

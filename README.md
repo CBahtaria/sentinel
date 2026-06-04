@@ -9,7 +9,7 @@
 [![Audit](https://img.shields.io/badge/security%20audit-2026--05--21-06b6d4)](./SECURITY-AUDIT-2026-05-21.md)
 [![License](https://img.shields.io/badge/license-Proprietary-grey)](#license)
 
-Real-time command and control platform for the **Umbutfo Eswatini Defence
+Real-time command and control platform for the **Unified Eswatini Defence
 Force**. Drone fleet supervision, threat detection, predictive analytics,
 operator-grade RBAC with 2FA, and a tamper-evident audit log. PHP 8 +
 MySQL on the data plane, Node.js WebSocket shim for telemetry, browser-based
@@ -262,7 +262,7 @@ issues for vulnerabilities.
 
 ## License
 
-Proprietary — UMBUTFO Eswatini Defence Force. All rights reserved.
+Proprietary — Unified Eswatini Defence Force. All rights reserved.
 
 ---
 
