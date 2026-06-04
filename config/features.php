@@ -1,7 +1,7 @@
 <?php
 /**
  * UEDF SENTINEL v4.0 - Enhanced Features Configuration
- * UMBUTFO ESWATINI DEFENCE FORCE
+ * Unified Eswatini Defence Force
  */
 
 // Create config directory if it doesn't exist
