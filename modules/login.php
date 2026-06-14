@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../src/Auth.php';
 /**
  * BARTARIA DEFENSE SYSTEM - Login Module
  */
@@ -16,19 +17,22 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    
-    // For testing - you can replace with database verification later
-    if ($username === 'commander' && $password === 'commander123') {
-        $_SESSION['user_id'] = 1;
-        $_SESSION['username'] = 'commander';
-        $_SESSION['full_name'] = 'Charles Bartaria';
-        $_SESSION['role'] = 'commander';
-        $_SESSION['two_factor_enabled'] = false;
-        
+
+    $auth = new SentinelAuth();
+    $result = $auth->login($username, $password);
+
+    if ($result['success']) {
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $result['user']['id'];
+        $_SESSION['username'] = $result['user']['username'];
+        $_SESSION['full_name'] = $result['user']['full_name'];
+        $_SESSION['role'] = $result['user']['role'];
+        $_SESSION['two_factor_enabled'] = $result['user']['twofa_enabled'] ?? false;
+
         header('Location: ?module=home');
         exit;
     } else {
-        $error = 'Invalid credentials';
+        $error = $result['error'] ?? 'Invalid credentials';
     }
 }
 ?>
@@ -219,12 +223,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="">
             <div class="form-group">
                 <label><i class="fas fa-user"></i> USERNAME</label>
-                <input type="text" name="username" value="commander" placeholder="Enter username" autocomplete="off">
+                <input type="text" name="username" value="" placeholder="Enter username" autocomplete="off">
             </div>
-            
+
             <div class="form-group">
                 <label><i class="fas fa-lock"></i> PASSWORD</label>
-                <input type="password" name="password" value="commander123" placeholder="Enter password">
+                <input type="password" name="password" value="" placeholder="Enter password">
             </div>
             
             <button type="submit" class="login-btn">
@@ -237,12 +241,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
         </form>
-        
-        <div class="info-box">
-            <p><i class="fas fa-crown"></i> Commander Access</p>
-            <p><i class="fas fa-user"></i> username: <span style="color:#00ff9d;">commander</span></p>
-            <p><i class="fas fa-key"></i> password: <span style="color:#00ff9d;">commander123</span></p>
-        </div>
         
         <div class="footer">
             <p>© <?= date('Y') ?> BARTARIA DEFENSE</p>

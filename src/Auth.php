@@ -197,17 +197,22 @@ class SentinelAuth {
      */
     public function login(string $username, string $password, ?array $deviceInfo = null): array {
         try {
-            // Record login attempt
-            $this->recordLoginAttempt($username, false);
-            
-            // Check for account lockout
+            // Lockout check MUST happen before password verification and before recording the attempt
             if ($this->isAccountLocked($username)) {
-                return $this->errorResponse('Account temporarily locked. Please try again later.');
+                return $this->errorResponse('Account temporarily locked due to too many failed attempts. Please try again in 15 minutes.');
             }
-            
+
+            // Also enforce attempt-count within the rolling 15-minute window (belt-and-suspenders)
+            if ($this->getRecentAttemptCount($username) >= $this->config['max_login_attempts']) {
+                return $this->errorResponse('Account temporarily locked due to too many failed attempts. Please try again in 15 minutes.');
+            }
+
+            // Record login attempt (failed by default; updated to success below if auth passes)
+            $this->recordLoginAttempt($username, false);
+
             // Get user
             $user = $this->getUserByUsernameOrEmail($username);
-            
+
             if (!$user || !$this->verifyPassword($password, $user['password_hash'])) {
                 $this->incrementFailedAttempts($username);
                 return $this->errorResponse('Invalid credentials');
@@ -220,7 +225,12 @@ class SentinelAuth {
             
             // Reset failed attempts on successful login
             $this->resetFailedAttempts($user['id']);
-            
+
+            // Prevent session fixation — regenerate session ID before issuing tokens
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_regenerate_id(true);
+            }
+
             // Generate tokens
             $tokens = $this->generateTokens();
             $expires = $this->getExpiryTime();
@@ -659,12 +669,26 @@ class SentinelAuth {
      */
     private function isAccountLocked(string $username): bool {
         $stmt = $this->pdo->prepare("
-            SELECT locked_until FROM users 
-            WHERE (username = ? OR email = ?) 
+            SELECT locked_until FROM users
+            WHERE (username = ? OR email = ?)
             AND locked_until > NOW()
         ");
         $stmt->execute([$username, $username]);
         return $stmt->fetch() !== false;
+    }
+
+    /**
+     * Count failed login attempts for a username within the lockout window
+     */
+    private function getRecentAttemptCount(string $username): int {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM login_attempts
+            WHERE username = ?
+            AND success = FALSE
+            AND attempted_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)
+        ");
+        $stmt->execute([$username, $this->config['lockout_duration']]);
+        return (int) $stmt->fetchColumn();
     }
     
     /**

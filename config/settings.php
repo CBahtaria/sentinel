@@ -11,7 +11,7 @@ return [
     
     // Feature Flags
     'websocket' => true,
-    'debug' => true,
+    'debug' => false,  // Never expose errors to users in production; use error_log instead
     'maintenance' => false,
     
     // Display Settings
@@ -22,12 +22,13 @@ return [
     'session_timeout' => 3600,
     'session_httponly' => true,
     
-    // Database (if needed)
+    // Database credentials are loaded from environment variables only — never hardcoded here.
+    // Required: DB_HOST, DB_NAME, DB_USER, DB_PASS
     'database' => [
-        'host' => 'localhost',
-        'name' => 'uedf_sentinel',
-        'user' => 'root',
-        'pass' => ''
+        'host' => $_ENV['DB_HOST'] ?? null,
+        'name' => $_ENV['DB_NAME'] ?? null,
+        'user' => $_ENV['DB_USER'] ?? null,
+        'pass' => $_ENV['DB_PASS'] ?? null,
     ]
 ];
 ?>

@@ -13,14 +13,16 @@ define('MAX_ATTEMPTS', 100);
 define('CONCURRENT_USERS', 10);
 define('DELAY_MS', 100);
 
-// Test credentials
+// Test credentials — loaded from environment; never hardcoded
+// Required env vars: STRESS_USER_ADMIN, STRESS_PASS_ADMIN, STRESS_USER_VIEWER, STRESS_PASS_VIEWER,
+//                    STRESS_USER_COMMANDER, STRESS_PASS_COMMANDER, STRESS_USER_OPERATOR, STRESS_PASS_OPERATOR
 $test_users = [
-    ['username' => 'admin', 'password' => 'admin123', 'expected' => 'success'],
-    ['username' => 'viewer', 'password' => 'viewer123', 'expected' => 'success'],
+    ['username' => getenv('STRESS_USER_ADMIN') ?: 'admin', 'password' => getenv('STRESS_PASS_ADMIN') ?: '', 'expected' => 'success'],
+    ['username' => getenv('STRESS_USER_VIEWER') ?: 'viewer', 'password' => getenv('STRESS_PASS_VIEWER') ?: '', 'expected' => 'success'],
     ['username' => 'admin', 'password' => 'wrong', 'expected' => 'failure'],
     ['username' => 'fake', 'password' => 'fake123', 'expected' => 'failure'],
-    ['username' => 'commander', 'password' => 'commander123', 'expected' => 'success'],
-    ['username' => 'operator', 'password' => 'operator123', 'expected' => 'success'],
+    ['username' => getenv('STRESS_USER_COMMANDER') ?: 'commander', 'password' => getenv('STRESS_PASS_COMMANDER') ?: '', 'expected' => 'success'],
+    ['username' => getenv('STRESS_USER_OPERATOR') ?: 'operator', 'password' => getenv('STRESS_PASS_OPERATOR') ?: '', 'expected' => 'success'],
 ];
 
 // Results tracking

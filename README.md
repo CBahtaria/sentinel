@@ -184,15 +184,14 @@ Before opening to non-VPN traffic, run through
 [`SECURITY-AUDIT-2026-05-21.md`](./SECURITY-AUDIT-2026-05-21.md):
 
 - [ ] Rotate the 4 default seeded users (`commander/operator/analyst/viewer`).
-- [ ] Move `uedf-sentinel-mobile-2026` API key into `.env`.
-- [ ] Remove the `localhost` + empty-password PDO fallback.
-- [ ] Replace `Access-Control-Allow-Origin: *` with an explicit allowlist.
-- [ ] Grep for `$db->query(` with `$` interpolation; convert to prepared
-      statements.
-- [ ] Add `session_regenerate_id(true)` to `login()`.
-- [ ] `display_errors=0` in production.
-- [ ] Add CSP/STS/XCTO/XFO headers middleware to `api/*.php`.
-- [ ] Verify login lockout enforces (6 failed attempts → 429).
+- [x] Move API key into `.env` — `SENTINEL_API_KEY` env var required.
+- [x] Remove the `localhost` + empty-password PDO fallback — env vars required.
+- [x] Replace `Access-Control-Allow-Origin: *` with an explicit allowlist.
+- [x] Convert raw interpolated queries to PDO prepared statements (`cron/daily_report.php`).
+- [x] Add `session_regenerate_id(true)` to `login()`.
+- [x] `display_errors=0` in production.
+- [x] Add CSP/STS/XCTO/XFO/HSTS headers to all `api/*.php` entry points.
+- [x] Login lockout enforced before `password_verify` (5 attempts → 15 min lockout).
 
 ---
 

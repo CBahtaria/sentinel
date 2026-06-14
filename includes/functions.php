@@ -35,7 +35,11 @@ function verifyCSRFToken($token) {
 
 function logActivity($user_id, $action, $details = '') {
     try {
-        $pdo = new PDO('mysql:host=localhost;dbname=uedf_sentinel', 'root', '');
+        $dbHost = $_ENV['DB_HOST'] ?? throw new \RuntimeException('DB_HOST not set');
+        $dbName = $_ENV['DB_NAME'] ?? throw new \RuntimeException('DB_NAME not set');
+        $dbUser = $_ENV['DB_USER'] ?? throw new \RuntimeException('DB_USER not set');
+        $dbPass = $_ENV['DB_PASS'] ?? throw new \RuntimeException('DB_PASS not set');
+        $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName}", $dbUser, $dbPass);
         $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action, details, ip_address, timestamp) VALUES (?, ?, ?, ?, NOW())");
         $stmt->execute([$user_id, $action, $details, $_SERVER['REMOTE_ADDR']]);
     } catch (Exception $e) {
