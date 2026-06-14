@@ -129,7 +129,7 @@
             <p style="color: #a0aec0; margin-top: 5px;">Mobile Command Interface</p>
         </div>
         <div class="api-key-box">
-            <i class="fas fa-key"></i> API Key: uedf-sentinel-mobile-2026
+            <i class="fas fa-key"></i> API Key: <em>set via SENTINEL_API_KEY env var</em>
         </div>
     </div>
 
@@ -155,8 +155,8 @@
                 <span class="status-badge status-online">ACTIVE</span>
                 <div class="description">Authenticate user and receive access token</div>
                 <pre>{
-    "username": "commander",
-    "password": "commander123",
+    "username": "&lt;your_username&gt;",
+    "password": "&lt;your_password&gt;",
     "device_id": "mobile_device_123"
 }</pre>
                 <div><strong>Response:</strong> { "token": "...", "user": { "id": 1, "username": "commander", "role": "commander" } }</div>
@@ -190,7 +190,7 @@
                 <span class="url">/drones.php?action=list</span>
                 <span class="status-badge status-online">ACTIVE</span>
                 <div class="description">Get all drones with fleet statistics</div>
-                <pre>Headers: X-API-Key: uedf-sentinel-mobile-2026</pre>
+                <pre>Headers: X-API-Key: &lt;value of SENTINEL_API_KEY env var&gt;</pre>
             </div>
 
             <div class="endpoint">
@@ -289,7 +289,7 @@
             try {
                 const response = await fetch('http://localhost:8080/sentinel/api/v1/system.php?type=status', {
                     headers: {
-                        'X-API-Key': 'uedf-sentinel-mobile-2026'
+                        'X-API-Key': window.__SENTINEL_API_KEY || ''
                     }
                 });
                 

@@ -7,7 +7,10 @@ session_start();
 require_once '../config/database.php';
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+$_cors_allowed = ['https://sentinel.uedf.gov.sz'];
+if (getenv('SENTINEL_ENV') === 'development') { $_cors_allowed[] = 'http://localhost:8080'; $_cors_allowed[] = 'http://localhost:3000'; }
+$_cors_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($_cors_origin, $_cors_allowed, true)) { header('Access-Control-Allow-Origin: ' . $_cors_origin); header('Vary: Origin'); }
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 

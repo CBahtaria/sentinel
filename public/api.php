@@ -8,7 +8,10 @@ require_once __DIR__ . '/../src/session.php';
 
 // Set headers
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+$_cors_allowed = ['https://sentinel.uedf.gov.sz'];
+if (getenv('SENTINEL_ENV') === 'development') { $_cors_allowed[] = 'http://localhost:8080'; $_cors_allowed[] = 'http://localhost:3000'; }
+$_cors_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($_cors_origin, $_cors_allowed, true)) { header('Access-Control-Allow-Origin: ' . $_cors_origin); header('Vary: Origin'); }
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Max-Age: 3600');

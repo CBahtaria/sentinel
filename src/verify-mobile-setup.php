@@ -8,7 +8,11 @@ echo "UEDF SENTINEL Mobile Setup Verification\n";
 echo "=============================================\n\n";
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=uedf_sentinel', 'root', '');
+    $dbHost = $_ENV['DB_HOST'] ?? throw new \RuntimeException('DB_HOST not set');
+    $dbName = $_ENV['DB_NAME'] ?? throw new \RuntimeException('DB_NAME not set');
+    $dbUser = $_ENV['DB_USER'] ?? throw new \RuntimeException('DB_USER not set');
+    $dbPass = $_ENV['DB_PASS'] ?? throw new \RuntimeException('DB_PASS not set');
+    $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName}", $dbUser, $dbPass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     // Check mobile_sessions table
@@ -64,7 +68,7 @@ try {
     echo "=============================================\n";
     echo "\n";
     echo "📱 API Base URL: http://localhost:8080/sentinel/api/v1/\n";
-    echo "🔑 API Key: uedf-sentinel-mobile-2026\n";
+    echo "🔑 API Key: " . (getenv('SENTINEL_API_KEY') ? '[set via env]' : '[SENTINEL_API_KEY NOT SET]') . "\n";
     echo "📚 API Docs: http://localhost:8080/sentinel/api-docs.php\n";
     echo "\n";
     echo "Test the API with: http://localhost:8080/sentinel/test-api.php\n";

@@ -1,7 +1,10 @@
 <?php
 // api_get_stats.php - Real-time data endpoint
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+$_cors_allowed = ['https://sentinel.uedf.gov.sz'];
+if (getenv('SENTINEL_ENV') === 'development') { $_cors_allowed[] = 'http://localhost:8080'; $_cors_allowed[] = 'http://localhost:3000'; }
+$_cors_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($_cors_origin, $_cors_allowed, true)) { header('Access-Control-Allow-Origin: ' . $_cors_origin); header('Vary: Origin'); }
 
 require_once __DIR__ . '/../src/db.php';
 

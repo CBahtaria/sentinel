@@ -4,9 +4,10 @@
  * Run this script daily to email reports to all users
  */
 
-// Enable error reporting for debugging
+// Log errors to error_log; do not display to stdout in production
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 'On');
 
 echo "=============================================\n";
 echo "UEDF SENTINEL Daily Report Generator\n";
@@ -129,10 +130,10 @@ try {
     
     // Log the batch job
     $stmt = $db->prepare("
-        INSERT INTO audit_logs (user_id, action, details) 
-        VALUES (1, 'DAILY_REPORT_BATCH', 'Daily reports sent to $success_count users')
+        INSERT INTO audit_logs (user_id, action, details)
+        VALUES (1, 'DAILY_REPORT_BATCH', ?)
     ");
-    $stmt->execute();
+    $stmt->execute(['Daily reports sent to ' . $success_count . ' users']);
     
 } catch (PDOException $e) {
     echo "❌ Database error: " . $e->getMessage() . "\n";
