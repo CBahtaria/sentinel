@@ -4,6 +4,8 @@
  */
 
 header('Content-Type: application/json');
+header('X-API-Deprecated: 2026-09-01');
+header('X-API-Successor: /api/v2');
 $_cors_allowed = ['https://sentinel.uedf.gov.sz'];
 if (getenv('SENTINEL_ENV') === 'development') { $_cors_allowed[] = 'http://localhost:8080'; $_cors_allowed[] = 'http://localhost:3000'; }
 $_cors_origin = $_SERVER['HTTP_ORIGIN'] ?? '';

@@ -5,7 +5,7 @@
 [![CI](https://github.com/CBahtaria/sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/CBahtaria/sentinel/actions/workflows/ci.yml)
 [![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Status](https://img.shields.io/badge/status-pre--production-ff006e)](./SECURITY-AUDIT-2026-05-21.md)
+[![Status](https://img.shields.io/badge/status-post--audit%2C%20awaiting%20UAT-f59e0b)](./SECURITY-AUDIT-2026-05-21.md)
 [![Audit](https://img.shields.io/badge/security%20audit-2026--05--21-06b6d4)](./SECURITY-AUDIT-2026-05-21.md)
 [![License](https://img.shields.io/badge/license-Proprietary-grey)](#license)
 
@@ -19,10 +19,7 @@ Sister project to [agentic-uav-stack](https://github.com/CBahtaria/agentic-uav-s
 — the C2 layer for the autonomous platform. Both subscribe to the same
 NATS namespace (`uav.v1.*`).
 
-> **Pre-production.** A structural security audit on 2026-05-21 found
-> 3 Critical and 6 High findings. None are exploited, but the system
-> **must not be deployed** until they are resolved.
-> See [`SECURITY.md`](./SECURITY.md) and [`SECURITY-AUDIT-2026-05-21.md`](./SECURITY-AUDIT-2026-05-21.md).
+> **Security audit complete (2026-05-21) — awaiting UAT.** All 9 findings resolved (3 Critical + 6 High). System is cleared for user acceptance testing. See [`SECURITY.md`](./SECURITY.md) and [`SECURITY-AUDIT-2026-05-21.md`](./SECURITY-AUDIT-2026-05-21.md).
 
 ---
 
@@ -239,7 +236,7 @@ trackers, no telemetry.
 - [x] Real-time threat feed + heatmap
 - [x] Report generation (PDF / CSV / JSON)
 - [x] WebSocket telemetry shim
-- [ ] **Resolve all 9 audit findings** (blocker for production)
+- [x] **Resolve all 9 audit findings** (completed 2026-05-21)
 - [ ] CSP / security headers middleware
 - [ ] Composer.json + PHPUnit harness
 - [ ] Mobile client integration
