@@ -20,7 +20,7 @@ class Features {
     const SMTP_HOST = 'smtp.gmail.com';
     const SMTP_PORT = 587;
     const SMTP_USER = 'sentinel@uedf.gov.sz';
-    const SMTP_PASS = 'your-password'; // Change this!
+    // SMTP_PASS intentionally omitted — loaded from env via smtpPass()
     
     // API settings
     const API_ENABLED = true;
@@ -32,6 +32,12 @@ class Features {
             throw new \RuntimeException('SENTINEL_API_KEY environment variable is not set — refusing to start.');
         }
         return $key;
+    }
+
+    public static function smtpPass(): string {
+        $v = $_ENV['SENTINEL_SMTP_PASS'] ?? getenv('SENTINEL_SMTP_PASS');
+        if (!$v) throw new \RuntimeException('SENTINEL_SMTP_PASS env var not set');
+        return $v;
     }
     
     // Real-time updates
