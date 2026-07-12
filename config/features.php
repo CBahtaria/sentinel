@@ -24,8 +24,15 @@ class Features {
     
     // API settings
     const API_ENABLED = true;
-    const API_KEY = 'uedf-sentinel-api-key-2026'; // Change this!
     const API_RATE_LIMIT = 100; // requests per minute
+
+    public static function apiKey(): string {
+        $key = $_ENV['SENTINEL_API_KEY'] ?? getenv('SENTINEL_API_KEY');
+        if ($key === false || $key === '') {
+            throw new \RuntimeException('SENTINEL_API_KEY environment variable is not set — refusing to start.');
+        }
+        return $key;
+    }
     
     // Real-time updates
     const REALTIME_REFRESH = 5000; // milliseconds

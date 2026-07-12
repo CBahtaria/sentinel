@@ -1,3 +1,11 @@
+<?php
+$wsToken = $_ENV['SENTINEL_WS_TOKEN'] ?? getenv('SENTINEL_WS_TOKEN');
+if ($wsToken === false || $wsToken === '') {
+    http_response_code(500);
+    error_log('SENTINEL_WS_TOKEN environment variable is not set');
+    exit('Server configuration error.');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,7 +131,7 @@
             ws = new SentinelWebSocket({
                 userId: 'commander',
                 userRole: 'commander',
-                token: 'sentinel-websocket-token'
+                token: '<?= htmlspecialchars($wsToken, ENT_QUOTES, 'UTF-8') ?>'
             });
             
             ws.on('onOpen', () => {
