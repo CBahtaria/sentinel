@@ -27,11 +27,20 @@ switch($endpoint) {
     case 'threats':
         echo json_encode(['status' => 'success', 'data' => ['threats' => []]]);
         break;
+    case 'lce':
+        require __DIR__ . '/lce.php';
+        break;
+    case 'ecosystem':
+        require __DIR__ . '/ecosystem.php';
+        break;
+    case 'adaptive':
+        require __DIR__ . '/adaptive.php';
+        break;
     default:
         echo json_encode([
             'api_version' => 'v1',
             'status' => 'operational',
-            'endpoints' => ['drones', 'threats', 'users', 'nodes']
+            'endpoints' => ['drones', 'threats', 'users', 'nodes', 'lce', 'ecosystem', 'adaptive']
         ]);
 }
 ?>
